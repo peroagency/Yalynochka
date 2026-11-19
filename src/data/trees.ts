@@ -39,7 +39,7 @@ export const PRICE_TIERS: Record<TreeHeight, PriceTier> = {
     discountPercent: 25,
     salePrice: 3510,
     deliveryLabel: 'Стандартна коробка до 15 кг',
-    estimatedDeliveryCost: 'від 135 грн',
+    estimatedDeliveryCost: '135–250 грн',
   },
   '1,8 м': {
     height: '1,8 м',
@@ -48,7 +48,7 @@ export const PRICE_TIERS: Record<TreeHeight, PriceTier> = {
     discountPercent: 25,
     salePrice: 5715,
     deliveryLabel: 'Хіт · Дешева доставка у відділення',
-    estimatedDeliveryCost: 'від 165 грн',
+    estimatedDeliveryCost: '200–300 грн',
     recommended: true,
   },
   '2,1 м': {
@@ -58,7 +58,7 @@ export const PRICE_TIERS: Record<TreeHeight, PriceTier> = {
     discountPercent: 25,
     salePrice: 7380,
     deliveryLabel: 'Великогабаритне відділення',
-    estimatedDeliveryCost: 'від 280 грн',
+    estimatedDeliveryCost: '400–600 грн',
   },
   '2,3 м': {
     height: '2,3 м',
@@ -67,7 +67,7 @@ export const PRICE_TIERS: Record<TreeHeight, PriceTier> = {
     discountPercent: 25,
     salePrice: 8910,
     deliveryLabel: 'Вантажне відділення / курʼєр',
-    estimatedDeliveryCost: 'від 360 грн',
+    estimatedDeliveryCost: '500–800 грн',
   },
   '2,5 м': {
     height: '2,5 м',
@@ -76,7 +76,7 @@ export const PRICE_TIERS: Record<TreeHeight, PriceTier> = {
     discountPercent: 25,
     salePrice: 11880,
     deliveryLabel: 'Вантажне відділення / курʼєр',
-    estimatedDeliveryCost: 'від 450 грн',
+    estimatedDeliveryCost: '600–900 грн',
   },
 };
 

@@ -382,8 +382,8 @@ export default function App() {
                       </div>
                       <p className="mt-1.5 text-xs text-[#f3ead3]/85">
                         {heroHeight === '1,8 м'
-                          ? 'Оплата при отриманні · Дешева доставка у відділення (від 165 грн)'
-                          : `Оплата при отриманні · ${heroTier.deliveryLabel}`}
+                          ? `Оплата при отриманні · Дешева доставка у відділення (${heroTier.estimatedDeliveryCost})`
+                          : `Оплата при отриманні · ${heroTier.deliveryLabel} (${heroTier.estimatedDeliveryCost})`}
                       </p>
                       <p className="mt-1 text-[11px] text-[#f3ead3]/70">
                         {heroPhoto.label} · *на фото {heroTree.name} {heroHeight}
