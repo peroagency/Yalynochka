@@ -88,12 +88,12 @@ export const TREE_OFFERS: TreeOffer[] = [
     description:
       'Класична лісова красуня з густими мʼякими гілочками, які не обсипаються і не колються. Максимально наближена до живої карпатської смереки.',
     needleNote: 'Насичений природний зелений відтінок, металева підставка в комплекті.',
-    image: '/assets/trees/alaska_01.jpg',
+    image: './assets/trees/alaska_01.jpg',
     gallery: [
-      { src: '/assets/trees/alaska_01.jpg', label: 'Біля каміна' },
-      { src: '/assets/trees/alaska_04.jpg', label: 'Хвоя зблизька' },
-      { src: '/assets/trees/alaska_05.jpg', label: 'Гілка макро' },
-      { src: '/assets/trees/alaska_06.jpg', label: 'Денне світло' },
+      { src: './assets/trees/alaska_01.jpg', label: 'Біля каміна' },
+      { src: './assets/trees/alaska_04.jpg', label: 'Хвоя зблизька' },
+      { src: './assets/trees/alaska_05.jpg', label: 'Гілка макро' },
+      { src: './assets/trees/alaska_06.jpg', label: 'Денне світло' },
     ],
     stockByHeight: {
       '1,5 м': 8,
@@ -110,12 +110,12 @@ export const TREE_OFFERS: TreeOffer[] = [
     description:
       'Модель Аляска з преміальним щільним напиленням білого штучного снігу. Безпечний фіксуючий склад без запаху, тримається роками.',
     needleNote: 'Ефект свіжого зимового інею, густа крона до самої підлоги.',
-    image: '/assets/trees/07_alaska_snih_01.jpg',
+    image: './assets/trees/07_alaska_snih_01.jpg',
     gallery: [
-      { src: '/assets/trees/07_alaska_snih_01.jpg', label: 'Загальний вигляд' },
-      { src: '/assets/trees/07_alaska_snih_04.jpg', label: 'Хвоя зблизька' },
-      { src: '/assets/trees/07_alaska_snih_05.jpg', label: 'Сніг макро' },
-      { src: '/assets/trees/07_alaska_snih_02.jpg', label: 'Інший ракурс' },
+      { src: './assets/trees/07_alaska_snih_01.jpg', label: 'Загальний вигляд' },
+      { src: './assets/trees/07_alaska_snih_04.jpg', label: 'Хвоя зблизька' },
+      { src: './assets/trees/07_alaska_snih_05.jpg', label: 'Сніг макро' },
+      { src: './assets/trees/07_alaska_snih_02.jpg', label: 'Інший ракурс' },
     ],
     stockByHeight: {
       '1,5 м': 6,
@@ -132,12 +132,12 @@ export const TREE_OFFERS: TreeOffer[] = [
     description:
       'Ялинка з виразними ярусними горизонтальними гілками у скандинавському стилі. Зручно розвішувати великі іграшки та гірлянди.',
     needleNote: 'Свіжий хвойний зелений тон, посилений сталевий каркас.',
-    image: '/assets/trees/finska_green_01.jpg',
+    image: './assets/trees/finska_green_01.jpg',
     gallery: [
-      { src: '/assets/trees/finska_green_01.jpg', label: 'Біля каміна' },
-      { src: '/assets/trees/finska_green_03.jpg', label: 'Хвоя зблизька' },
-      { src: '/assets/trees/finska_green_05.jpg', label: 'Гілки макро' },
-      { src: '/assets/trees/finska_green_06.jpg', label: 'Денне світло' },
+      { src: './assets/trees/finska_green_01.jpg', label: 'Біля каміна' },
+      { src: './assets/trees/finska_green_03.jpg', label: 'Хвоя зблизька' },
+      { src: './assets/trees/finska_green_05.jpg', label: 'Гілки макро' },
+      { src: './assets/trees/finska_green_06.jpg', label: 'Денне світло' },
     ],
     stockByHeight: {
       '1,5 м': 9,
@@ -154,12 +154,12 @@ export const TREE_OFFERS: TreeOffer[] = [
     description:
       'Шляхетний смарагдово-блакитний відтінок хвої, натхненний північними ялинами. Виглядає ефектно навіть без декору.',
     needleNote: 'Глибокий смарагдовий колір з легким сріблястим переливом.',
-    image: '/assets/trees/finska_smarahd_07.jpg',
+    image: './assets/trees/finska_smarahd_07.jpg',
     gallery: [
-      { src: '/assets/trees/finska_smarahd_07.jpg', label: 'Без декору' },
-      { src: '/assets/trees/finska_smarahd_01.jpg', label: 'З декором' },
-      { src: '/assets/trees/finska_smarahd_03.jpg', label: 'Хвоя зблизька' },
-      { src: '/assets/trees/finska_smarahd_08.jpg', label: 'Денне світло' },
+      { src: './assets/trees/finska_smarahd_07.jpg', label: 'Без декору' },
+      { src: './assets/trees/finska_smarahd_01.jpg', label: 'З декором' },
+      { src: './assets/trees/finska_smarahd_03.jpg', label: 'Хвоя зблизька' },
+      { src: './assets/trees/finska_smarahd_08.jpg', label: 'Денне світло' },
     ],
     stockByHeight: {
       '1,5 м': 5,
@@ -176,12 +176,12 @@ export const TREE_OFFERS: TreeOffer[] = [
     description:
       'Пишна традиційна сосна з довгими шовковистими голками насиченого зеленого кольору. Обʼємний силует, який заповнює простір затишком.',
     needleNote: 'Подовжені гнучкі голки, стійка розбірна конструкція.',
-    image: '/assets/trees/sosna_06.jpg',
+    image: './assets/trees/sosna_06.jpg',
     gallery: [
-      { src: '/assets/trees/sosna_06.jpg', label: 'Загальний вигляд' },
-      { src: '/assets/trees/sosna_07.jpg', label: 'Хвоя зблизька' },
-      { src: '/assets/trees/sosna_04.jpg', label: 'Боковий ракурс' },
-      { src: '/assets/trees/sosna_01.jpg', label: 'В інтерʼєрі' },
+      { src: './assets/trees/sosna_06.jpg', label: 'Загальний вигляд' },
+      { src: './assets/trees/sosna_07.jpg', label: 'Хвоя зблизька' },
+      { src: './assets/trees/sosna_04.jpg', label: 'Боковий ракурс' },
+      { src: './assets/trees/sosna_01.jpg', label: 'В інтерʼєрі' },
     ],
     stockByHeight: {
       '1,5 м': 7,
@@ -193,7 +193,7 @@ export const TREE_OFFERS: TreeOffer[] = [
   },
 ];
 
-export const LOGO_PATH = '/assets/aistudio/image_98a6d909.png';
+export const LOGO_PATH = './assets/aistudio/image_98a6d909.png';
 
 export function formatUAH(amount: number): string {
   return amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
