@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ArrowRight,
+  ArrowUp,
   Check,
   Maximize2,
   MessageCircle,
@@ -12,6 +13,7 @@ import {
 } from 'lucide-react';
 import { CheckoutDrawer, CartItem } from './components/CheckoutDrawer';
 import { CONTACT_LINKS, ContactOrderModal } from './components/ContactOrderModal';
+import { SnowOverlay } from './components/SnowOverlay';
 import { TreeGalleryModal } from './components/TreeGalleryModal';
 import { TreeOfferCatalogCard } from './components/TreeOfferCatalogCard';
 import {
@@ -42,6 +44,16 @@ export default function App() {
     tree: TreeOffer | null;
     height: TreeHeight;
   }>({ isOpen: false, tree: null, height: DEFAULT_TARGET_HEIGHT });
+  const [showScrollTop, setShowScrollTop] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 360);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const openOrderChoice = (tree: TreeOffer | null, height: TreeHeight = DEFAULT_TARGET_HEIGHT) => {
     setContactModal({ isOpen: true, tree, height });
@@ -141,6 +153,8 @@ export default function App() {
 
   return (
     <div id="top" className="min-h-screen flex flex-col bg-[#f8f6f1] text-[#112217]">
+      <SnowOverlay />
+
       {/* Top Bar Contract: 3 zones, 1 row, single-line controls */}
       <header className="sticky top-0 z-40 h-16 bg-[#0e2216] text-[#f3ead3] border-b border-white/10">
         <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-8">
@@ -297,10 +311,16 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => openOrderChoice(null)}
-                    className="inline-flex items-center gap-2 px-4 py-3.5 rounded-lg border border-white/20 text-sm font-semibold text-[#f3ead3] hover:bg-white/10 transition-colors cursor-pointer whitespace-nowrap"
+                    className="inline-flex items-center gap-2.5 px-4 py-3.5 rounded-lg border border-white/20 text-sm font-semibold text-[#f3ead3] hover:bg-white/10 transition-colors cursor-pointer whitespace-nowrap"
                   >
-                    <Phone className="w-4 h-4" />
+                    <Phone className="w-4 h-4 shrink-0" />
                     <span>Контакти</span>
+                    <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#4ade80] pl-2 border-l border-white/15">
+                      <span className="animate-online-dot leading-none" aria-hidden="true">
+                        ●
+                      </span>
+                      <span>online</span>
+                    </span>
                   </button>
                 </div>
               </div>
@@ -412,7 +432,7 @@ export default function App() {
                 </p>
               </div>
               <div>
-                <p className="font-semibold text-[#f3ead3]">Ціль №1: висота 1,8 м</p>
+                <p className="font-semibold text-[#f3ead3]">Кращий вибір: висота 1,8 м</p>
                 <p className="text-xs text-[#f3ead3]/70 mt-1">
                   Оптимальна коробка — низький тариф доставки Новою Поштою.
                 </p>
@@ -714,20 +734,42 @@ export default function App() {
         </div>
       </footer>
 
-      {/* Floating Contacts Button */}
-      <button
-        type="button"
-        onClick={() => openOrderChoice(null)}
-        className="fixed bottom-5 right-5 z-40 inline-flex items-center gap-2 bg-[#0e2216] hover:bg-[#153120] text-[#f3ead3] px-4 py-3 rounded-xl shadow-xl border border-white/15 text-sm font-semibold transition-colors cursor-pointer whitespace-nowrap"
-      >
-        <MessageCircle className="w-4 h-4 text-[#e5d3a3]" />
-        <span>Контакти</span>
-      </button>
+      {/* Floating Action Stack: Scroll-to-Top + Contacts Button */}
+      <div className="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-2.5">
+        {showScrollTop && (
+          <button
+            type="button"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            aria-label="Прокрутити вгору"
+            title="Вгору"
+            className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-[#0e2216]/95 hover:bg-[#153120] text-[#f3ead3] border border-white/15 shadow-xl transition-colors cursor-pointer"
+          >
+            <ArrowUp className="w-5 h-5" />
+          </button>
+        )}
+
+        <button
+          type="button"
+          onClick={() => openOrderChoice(null)}
+          className="inline-flex items-center gap-2.5 bg-[#0e2216] hover:bg-[#153120] text-[#f3ead3] px-4 py-3 rounded-xl shadow-xl border border-white/15 text-sm font-semibold transition-colors cursor-pointer whitespace-nowrap"
+        >
+          <MessageCircle className="w-4 h-4 text-[#e5d3a3] shrink-0" />
+          <span>Контакти</span>
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#4ade80] pl-2 border-l border-white/15">
+            <span className="animate-online-dot leading-none" aria-hidden="true">
+              ●
+            </span>
+            <span>online</span>
+          </span>
+        </button>
+      </div>
 
       {toastMessage && (
         <div
           role="status"
-          className="fixed bottom-20 right-5 z-40 flex items-center gap-2.5 bg-[#0e2216] text-[#f3ead3] px-4 py-3 rounded-lg shadow-xl border border-white/15 text-sm font-medium"
+          className={`fixed right-5 z-50 flex items-center gap-2.5 bg-[#0e2216] text-[#f3ead3] px-4 py-3 rounded-lg shadow-xl border border-white/15 text-sm font-medium ${
+            showScrollTop ? 'bottom-34' : 'bottom-20'
+          }`}
         >
           <Check className="w-4 h-4 text-[#4ade80] shrink-0" />
           <span>{toastMessage}</span>

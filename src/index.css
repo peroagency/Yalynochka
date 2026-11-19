@@ -36,7 +36,79 @@
   text-wrap: balance;
 }
 
+@keyframes snowflakes-fall {
+  0% {
+    transform: translate3d(0, -10vh, 0);
+  }
+  100% {
+    transform: translate3d(0, 112vh, 0);
+  }
+}
+
+@keyframes snowflakes-shake {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    transform: translate3d(56px, 0, 0);
+  }
+}
+
+@keyframes online-blink {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.82);
+  }
+}
+
+.snowflakes-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none;
+  user-select: none;
+  overflow: hidden;
+}
+
+.snowflake-item {
+  position: absolute;
+  top: -10%;
+  animation-name: snowflakes-shake;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.snowflake-inner {
+  animation-name: snowflakes-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+.snowflake-orb {
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow:
+    0 0 8px 3px rgba(255, 255, 255, 0.72),
+    0 0 2px 1px rgba(14, 34, 22, 0.14);
+}
+
+.animate-online-dot {
+  animation: online-blink 1.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .snowflakes-overlay {
+    display: none !important;
+  }
+
   *,
   *::before,
   *::after {
@@ -46,3 +118,4 @@
     scroll-behavior: auto !important;
   }
 }
+
