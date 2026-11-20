@@ -10,7 +10,7 @@ import {
 } from '../data/trees';
 
 export const CONTACT_LINKS = {
-  viber: 'viber://chat?number=380996584484',
+  viber: 'viber://chat?number=%2B380996584484',
   viberDisplay: '+38 (099) 658-44-84',
   telegram: 'https://t.me/yalynochka_com',
   telegramHandle: '@yalynochka_com',
