@@ -116,7 +116,6 @@ jobs:
               set ftp:ssl-protect-data ${ssl_protect_data};
               set ssl:verify-certificate no;
               set ftp:passive-mode true;
-              set ftp:chmod no;
               set net:timeout 30;
               set net:max-retries 4;
               set net:reconnect-interval-base 3;
