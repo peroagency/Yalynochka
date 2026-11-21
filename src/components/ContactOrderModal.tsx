@@ -3,10 +3,10 @@ import { Check, Copy, Phone, ShoppingBag, X } from 'lucide-react';
 import {
   DEFAULT_TARGET_HEIGHT,
   HEIGHT_ORDER,
-  PRICE_TIERS,
   TreeHeight,
   TreeOffer,
   formatUAH,
+  getTreePriceTier,
 } from '../data/trees';
 
 export const CONTACT_LINKS = {
@@ -52,7 +52,7 @@ export function ContactOrderModal({
 
   if (!isOpen) return null;
 
-  const tier = PRICE_TIERS[height];
+  const tier = getTreePriceTier(selectedTree, height);
   const orderText = selectedTree
     ? `Добрий день! Хочу замовити ялинку ${selectedTree.name} (${height}) по знижці −25% за ${formatUAH(tier.salePrice)} грн (оплата при отриманні).`
     : 'Добрий день! Підкажіть, будь ласка, по замовленню литої ялинки зі знижкою 25%.';

@@ -3,10 +3,10 @@ import { ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import {
   DEFAULT_TARGET_HEIGHT,
   HEIGHT_ORDER,
-  PRICE_TIERS,
   TreeHeight,
   TreeOffer,
   formatUAH,
+  getTreePriceTier,
 } from '../data/trees';
 
 interface TreeGalleryModalProps {
@@ -53,7 +53,7 @@ export function TreeGalleryModal({
   if (!tree) return null;
 
   const currentPhoto = tree.gallery[activeIndex] ?? tree.gallery[0];
-  const tier = PRICE_TIERS[selectedHeight];
+  const tier = getTreePriceTier(tree, selectedHeight);
   const stock = tree.stockByHeight[selectedHeight];
 
   return (

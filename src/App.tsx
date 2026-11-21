@@ -25,6 +25,7 @@ import {
   TreeHeight,
   TreeOffer,
   formatUAH,
+  getTreePriceTier,
 } from './data/trees';
 
 export default function App() {
@@ -45,6 +46,7 @@ export default function App() {
     height: TreeHeight;
   }>({ isOpen: false, tree: null, height: DEFAULT_TARGET_HEIGHT });
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [priceTab, setPriceTab] = useState<'standard' | 'alaska-snow'>('standard');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -61,7 +63,7 @@ export default function App() {
 
   const heroTree = TREE_OFFERS.find((t) => t.id === heroTreeId) ?? TREE_OFFERS[0];
   const heroPhoto = heroTree.gallery[heroPhotoIdx] ?? heroTree.gallery[0];
-  const heroTier = PRICE_TIERS[heroHeight];
+  const heroTier = getTreePriceTier(heroTree, heroHeight);
 
   const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -428,7 +430,7 @@ export default function App() {
               <div>
                 <p className="font-semibold text-[#f3ead3]">Знижка 25% на всі висоти</p>
                 <p className="text-xs text-[#f3ead3]/70 mt-1">
-                  Від 3 600 грн за 1,5 м до 11 880 грн за 2,5 м без передоплат.
+                  Від 3 600 грн за 1,5 м до 12 600 грн за 2,5 м без передоплат.
                 </p>
               </div>
               <div>
@@ -520,7 +522,10 @@ export default function App() {
                       onClick={() => openOrderChoice(tree, DEFAULT_TARGET_HEIGHT)}
                       className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#0e2216] hover:bg-[#153120] text-[#f3ead3] px-3.5 py-2 rounded-lg transition-colors cursor-pointer whitespace-nowrap tabular-nums"
                     >
-                      <span>Забрати 1,8 м — 5 580 грн</span>
+                      <span>
+                        Забрати 1,8 м —{' '}
+                        {formatUAH(getTreePriceTier(tree, DEFAULT_TARGET_HEIGHT).salePrice)} грн
+                      </span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -567,11 +572,46 @@ export default function App() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             <div className="lg:col-span-7">
               <p className="text-xs font-semibold text-[#b81d24] tracking-wide mb-2">
-                Єдина акційна сітка для всіх 5 моделей
+                Прозорі ціни для всіх 5 моделей
               </p>
-              <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#112217] tracking-tight mb-6 text-balance">
-                Ціни зі знижкою 25%
-              </h2>
+              <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
+                <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#112217] tracking-tight text-balance">
+                  Ціни зі знижкою 25%
+                </h2>
+
+                <div
+                  role="tablist"
+                  aria-label="Вибір прайсу за моделями"
+                  className="inline-grid grid-cols-2 p-1 rounded-lg bg-[#efeae0] border border-[#0e2216]/12 shrink-0"
+                >
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={priceTab === 'standard'}
+                    onClick={() => setPriceTab('standard')}
+                    className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+                      priceTab === 'standard'
+                        ? 'bg-[#0e2216] text-[#f3ead3]'
+                        : 'text-[#112217]/75 hover:text-[#112217]'
+                    }`}
+                  >
+                    Зелені моделі та Сосна
+                  </button>
+                  <button
+                    type="button"
+                    role="tab"
+                    aria-selected={priceTab === 'alaska-snow'}
+                    onClick={() => setPriceTab('alaska-snow')}
+                    className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap ${
+                      priceTab === 'alaska-snow'
+                        ? 'bg-[#0e2216] text-[#f3ead3]'
+                        : 'text-[#112217]/75 hover:text-[#112217]'
+                    }`}
+                  >
+                    Аляска сніг
+                  </button>
+                </div>
+              </div>
 
               <div className="bg-white border border-[#0e2216]/12 rounded-xl overflow-hidden">
                 <div className="overflow-x-auto">
@@ -582,12 +622,17 @@ export default function App() {
                         <th className="py-3.5 px-4">Ціна</th>
                         <th className="py-3.5 px-4">Знижка</th>
                         <th className="py-3.5 px-4">Акційна ціна</th>
+                        <th className="py-3.5 px-4">Економія</th>
                         <th className="py-3.5 px-4">Доставка НП</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[#0e2216]/10 text-sm">
                       {HEIGHT_ORDER.map((height) => {
-                        const tier = PRICE_TIERS[height];
+                        const tier =
+                          priceTab === 'alaska-snow'
+                            ? getTreePriceTier('alaska-snow', height)
+                            : PRICE_TIERS[height];
+                        const savings = tier.originalPrice - tier.salePrice;
                         const isTarget = height === '1,8 м';
                         return (
                           <tr
@@ -615,6 +660,9 @@ export default function App() {
                             <td className="py-3.5 px-4 font-display text-lg font-bold text-[#112217] tabular-nums whitespace-nowrap">
                               {formatUAH(tier.salePrice)} грн
                             </td>
+                            <td className="py-3.5 px-4 text-xs font-semibold text-[#166534] tabular-nums whitespace-nowrap">
+                              −{formatUAH(savings)} грн
+                            </td>
                             <td className="py-3.5 px-4 text-xs text-[#112217]/80 tabular-nums whitespace-nowrap">
                               {tier.estimatedDeliveryCost}
                             </td>
@@ -625,6 +673,11 @@ export default function App() {
                   </table>
                 </div>
               </div>
+              <p className="mt-2.5 text-xs text-[#112217]/65">
+                {priceTab === 'alaska-snow'
+                  ? 'Ціни для моделі Аляска сніг (засніжена хвоя).'
+                  : 'Діє для моделей: Аляска, Фінська зелена, Фінська Смарагдова та Сосна.'}
+              </p>
             </div>
 
             <div id="delivery" className="lg:col-span-5 space-y-5">

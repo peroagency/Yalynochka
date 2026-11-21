@@ -16,6 +16,11 @@ export interface TreeGalleryPhoto {
   label: string;
 }
 
+export interface TreePriceOverride {
+  originalPrice: number;
+  salePrice: number;
+}
+
 export interface TreeOffer {
   id: string;
   name: string;
@@ -25,6 +30,7 @@ export interface TreeOffer {
   image: string;
   gallery: TreeGalleryPhoto[];
   stockByHeight: Record<TreeHeight, number>;
+  priceByHeight?: Record<TreeHeight, TreePriceOverride>;
 }
 
 export const HEIGHT_ORDER: TreeHeight[] = ['1,5 м', '1,8 м', '2,1 м', '2,3 м', '2,5 м'];
@@ -80,6 +86,36 @@ export const PRICE_TIERS: Record<TreeHeight, PriceTier> = {
   },
 };
 
+export const ALASKA_SNOW_PRICES: Record<TreeHeight, TreePriceOverride> = {
+  '1,5 м': { originalPrice: 6480, salePrice: 4860 },
+  '1,8 м': { originalPrice: 8880, salePrice: 6660 },
+  '2,1 м': { originalPrice: 11040, salePrice: 8280 },
+  '2,3 м': { originalPrice: 13320, salePrice: 9990 },
+  '2,5 м': { originalPrice: 16800, salePrice: 12600 },
+};
+
+export function getTreePriceTier(
+  treeOrId: TreeOffer | string | null | undefined,
+  height: TreeHeight
+): PriceTier {
+  const base = PRICE_TIERS[height];
+  if (!treeOrId) return base;
+
+  const override =
+    typeof treeOrId === 'string'
+      ? treeOrId === 'alaska-snow'
+        ? ALASKA_SNOW_PRICES[height]
+        : undefined
+      : treeOrId.priceByHeight?.[height];
+
+  if (!override) return base;
+  return {
+    ...base,
+    originalPrice: override.originalPrice,
+    salePrice: override.salePrice,
+  };
+}
+
 export const TREE_OFFERS: TreeOffer[] = [
   {
     id: 'alaska',
@@ -124,6 +160,7 @@ export const TREE_OFFERS: TreeOffer[] = [
       '2,3 м': 3,
       '2,5 м': 2,
     },
+    priceByHeight: ALASKA_SNOW_PRICES,
   },
   {
     id: 'finnish-green',

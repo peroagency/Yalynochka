@@ -14,10 +14,10 @@ import {
 import { CONTACT_LINKS } from './ContactOrderModal';
 import {
   HEIGHT_ORDER,
-  PRICE_TIERS,
   TreeHeight,
   TreeOffer,
   formatUAH,
+  getTreePriceTier,
 } from '../data/trees';
 
 export interface CartItem {
@@ -54,7 +54,7 @@ function buildAutoTreeSection(items: CartItem[], totalSale: number): string {
   if (items.length === 0) return '';
 
   const lines = items.map((item) => {
-    const lineTotal = PRICE_TIERS[item.height].salePrice * item.quantity;
+    const lineTotal = getTreePriceTier(item.tree, item.height).salePrice * item.quantity;
     return `• ${item.tree.name} (${item.height}) × ${item.quantity} — ${formatUAH(lineTotal)} грн`;
   });
 
@@ -75,11 +75,11 @@ export function CheckoutDrawer({
   onClearCart,
 }: CheckoutDrawerProps) {
   const totalSale = items.reduce(
-    (sum, item) => sum + PRICE_TIERS[item.height].salePrice * item.quantity,
+    (sum, item) => sum + getTreePriceTier(item.tree, item.height).salePrice * item.quantity,
     0
   );
   const totalOriginal = items.reduce(
-    (sum, item) => sum + PRICE_TIERS[item.height].originalPrice * item.quantity,
+    (sum, item) => sum + getTreePriceTier(item.tree, item.height).originalPrice * item.quantity,
     0
   );
   const totalSaved = totalOriginal - totalSale;
@@ -201,7 +201,7 @@ export function CheckoutDrawer({
                 </div>
 
                 {items.map((item) => {
-                  const tier = PRICE_TIERS[item.height];
+                  const tier = getTreePriceTier(item.tree, item.height);
                   const maxStock = item.tree.stockByHeight[item.height];
 
                   return (
@@ -306,7 +306,9 @@ export function CheckoutDrawer({
                 <span>
                   {items.some((i) => i.height === '1,8 м')
                     ? 'Чудовий вибір! Висота 1,8 м пакується у компактний короб — діє дешева доставка Новою Поштою (200–300 грн).'
-                    : 'Порада: висота 1,8 м (5 580 грн) має найвигідніший тариф доставки у стандартне відділення (200–300 грн).'}
+                    : `Порада: висота 1,8 м (${formatUAH(
+                        getTreePriceTier(items[0]?.tree, '1,8 м').salePrice
+                      )} грн) має найвигідніший тариф доставки у стандартне відділення (200–300 грн).`}
                 </span>
               </div>
 

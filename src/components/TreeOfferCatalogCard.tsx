@@ -12,10 +12,10 @@ import {
 import {
   DEFAULT_TARGET_HEIGHT,
   HEIGHT_ORDER,
-  PRICE_TIERS,
   TreeHeight,
   TreeOffer,
   formatUAH,
+  getTreePriceTier,
 } from '../data/trees';
 
 interface TreeOfferCatalogCardProps {
@@ -35,7 +35,7 @@ export function TreeOfferCatalogCard({
   const [photoIndex, setPhotoIndex] = useState(0);
   const [imgFailed, setImgFailed] = useState(false);
 
-  const tier = PRICE_TIERS[selectedHeight];
+  const tier = getTreePriceTier(tree, selectedHeight);
   const stock = tree.stockByHeight[selectedHeight];
   const activePhoto = tree.gallery[photoIndex] ?? tree.gallery[0];
 
