@@ -1,0 +1,7 @@
+﻿2026-11-21T11:16:04.6626643Z ##[group]Run npm install --legacy-peer-deps --no-audit --no-fund
+2026-11-21T11:16:04.6627174Z [36;1mnpm install --legacy-peer-deps --no-audit --no-fund[0m
+2026-11-21T11:16:04.6667899Z shell: /usr/bin/bash -e {0}
+2026-11-21T11:16:04.6668167Z ##[endgroup]
+2026-11-21T11:16:14.7801928Z npm warn deprecated node-domexception@1.0.0: Use your platform's native DOMException instead
+2026-11-21T11:16:17.0162520Z 
+2026-11-21T11:16:17.0167962Z added 181 packages in 12s

@@ -1,0 +1,33 @@
+﻿2026-11-21T11:16:29.9259708Z Current runner version: '2.338.2'
+2026-11-21T11:16:29.9285954Z ##[group]Runner Image Provisioner
+2026-11-21T11:16:29.9286880Z Hosted Compute Agent
+2026-11-21T11:16:29.9287467Z Version: 20261111.635
+2026-11-21T11:16:29.9288080Z Commit: b8a594ea514ff44cadb5342986c68b1eac6e22ed
+2026-11-21T11:16:29.9288761Z Build Date: 2026-11-11T01:49:01Z
+2026-11-21T11:16:29.9289410Z Worker ID: {5279b04f-97dc-4b90-a052-fd14ad0f91b1}
+2026-11-21T11:16:29.9290105Z Region: westus3
+2026-11-21T11:16:29.9290801Z Cloud: Azure
+2026-11-21T11:16:29.9291311Z ##[endgroup]
+2026-11-21T11:16:29.9292757Z ##[group]Operating System
+2026-11-21T11:16:29.9293321Z Ubuntu
+2026-11-21T11:16:29.9293861Z 26.04.1
+2026-11-21T11:16:29.9294344Z LTS
+2026-11-21T11:16:29.9294813Z ##[endgroup]
+2026-11-21T11:16:29.9295363Z ##[group]Runner Image
+2026-11-21T11:16:29.9295930Z Image: ubuntu-26.04
+2026-11-21T11:16:29.9296453Z Version: 20261116.202.1
+2026-11-21T11:16:29.9297461Z Included Software: https://github.com/actions/runner-images/blob/ubuntu26/20261116.202/images/ubuntu/Ubuntu2604-Readme.md
+2026-11-21T11:16:29.9299041Z Image Release: https://github.com/actions/runner-images/releases/tag/ubuntu26%2F20261116.202
+2026-11-21T11:16:29.9299896Z ##[endgroup]
+2026-11-21T11:16:29.9301344Z ##[group]GITHUB_TOKEN Permissions
+2026-11-21T11:16:29.9303263Z Contents: read
+2026-11-21T11:16:29.9303874Z Metadata: read
+2026-11-21T11:16:29.9304420Z Pages: write
+2026-11-21T11:16:29.9304924Z ##[endgroup]
+2026-11-21T11:16:29.9307029Z Secret source: Actions
+2026-11-21T11:16:29.9307890Z Cache mode: write
+2026-11-21T11:16:29.9308686Z Prepare workflow directory
+2026-11-21T11:16:29.9735857Z Prepare all required actions
+2026-11-21T11:16:29.9799847Z Getting action download info
+2026-11-21T11:16:30.2864610Z Download action repository 'actions/deploy-pages@v4' (SHA:d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e)
+2026-11-21T11:16:31.0342675Z Complete job name: deploy

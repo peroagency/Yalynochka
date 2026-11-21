@@ -236,8 +236,8 @@ export default function App() {
 
                 <p className="mt-5 text-base sm:text-lg leading-relaxed text-[#f3ead3]/85 max-w-2xl">
                   5 фірмових моделей із лімітованими залишками (до 9 шт. у кожному розмірі). Найвигідніший вибір сезону — висота{' '}
-                  <strong className="text-white font-semibold">1,8 м за 5 715 грн</strong>{' '}
-                  замість 7 620 грн: оптимальна для оселі та найдешевша доставка у стандартне відділення.
+                  <strong className="text-white font-semibold">1,8 м за 5 580 грн</strong>{' '}
+                  замість 7 440 грн: оптимальна для оселі та найдешевша доставка у стандартне відділення.
                 </p>
 
                 {/* Interactive Quick Preview Switcher */}
@@ -428,7 +428,7 @@ export default function App() {
               <div>
                 <p className="font-semibold text-[#f3ead3]">Знижка 25% на всі висоти</p>
                 <p className="text-xs text-[#f3ead3]/70 mt-1">
-                  Від 3 510 грн за 1,5 м до 11 880 грн за 2,5 м без передоплат.
+                  Від 3 600 грн за 1,5 м до 11 880 грн за 2,5 м без передоплат.
                 </p>
               </div>
               <div>
@@ -466,7 +466,7 @@ export default function App() {
             </div>
             <p className="text-sm text-[#112217]/75 max-w-md">
               Перемикайте ракурси та макро-фото хвої прямо на картці або натискайте на фото для збільшення. За замовчуванням обрано хітову висоту{' '}
-              <strong className="font-semibold text-[#112217]">1,8 м (5 715 грн)</strong>.
+              <strong className="font-semibold text-[#112217]">1,8 м (5 580 грн)</strong>.
             </p>
           </div>
 
@@ -520,7 +520,7 @@ export default function App() {
                       onClick={() => openOrderChoice(tree, DEFAULT_TARGET_HEIGHT)}
                       className="inline-flex items-center gap-1.5 text-xs font-semibold bg-[#0e2216] hover:bg-[#153120] text-[#f3ead3] px-3.5 py-2 rounded-lg transition-colors cursor-pointer whitespace-nowrap tabular-nums"
                     >
-                      <span>Забрати 1,8 м — 5 715 грн</span>
+                      <span>Забрати 1,8 м — 5 580 грн</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
@@ -651,7 +651,7 @@ export default function App() {
                   <li className="flex items-start gap-2.5">
                     <ShieldCheck className="w-4 h-4 text-[#e5d3a3] shrink-0 mt-0.5" />
                     <span>
-                      <strong className="text-white">Оплата при отриманні:</strong> ви перевіряєте густоту хвої та колір на пошті й лише потім сплачуєте 5 715 грн.
+                      <strong className="text-white">Оплата при отриманні:</strong> ви перевіряєте густоту хвої та колір на пошті й лише потім сплачуєте 5 580 грн.
                     </span>
                   </li>
                 </ul>
@@ -661,7 +661,7 @@ export default function App() {
                   onClick={() => openOrderChoice(TREE_OFFERS[0], '1,8 м')}
                   className="mt-6 w-full inline-flex items-center justify-center gap-2 bg-[#b81d24] hover:bg-[#99151b] text-white font-semibold text-sm py-3 px-5 rounded-lg transition-colors cursor-pointer"
                 >
-                  <span>Замовити 1,8 м за 5 715 грн</span>
+                  <span>Замовити 1,8 м за 5 580 грн</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>

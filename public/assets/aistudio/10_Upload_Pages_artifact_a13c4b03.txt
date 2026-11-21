@@ -1,0 +1,121 @@
+﻿2026-11-21T11:16:18.3989747Z ##[group]Run actions/upload-pages-artifact@v3
+2026-11-21T11:16:18.3990024Z with:
+2026-11-21T11:16:18.3990190Z   path: ./dist
+2026-11-21T11:16:18.3990359Z   name: github-pages
+2026-11-21T11:16:18.3990540Z   retention-days: 1
+2026-11-21T11:16:18.3990705Z env:
+2026-11-21T11:16:18.3990859Z   GITHUB_PAGES: true
+2026-11-21T11:16:18.3991023Z ##[endgroup]
+2026-11-21T11:16:18.4043282Z ##[start-action display=Archive artifact;id=__actions_upload-pages-artifact.__run]
+2026-11-21T11:16:18.4067761Z ##[group]Run echo ::group::Archive artifact
+2026-11-21T11:16:18.4068072Z [36;1mecho ::group::Archive artifact[0m
+2026-11-21T11:16:18.4068285Z [36;1mtar \[0m
+2026-11-21T11:16:18.4068525Z [36;1m  --dereference --hard-dereference \[0m
+2026-11-21T11:16:18.4068770Z [36;1m  --directory "$INPUT_PATH" \[0m
+2026-11-21T11:16:18.4069006Z [36;1m  -cvf "$RUNNER_TEMP/artifact.tar" \[0m
+2026-11-21T11:16:18.4069235Z [36;1m  --exclude=.git \[0m
+2026-11-21T11:16:18.4069462Z [36;1m  --exclude=.github \[0m
+2026-11-21T11:16:18.4069707Z [36;1m  .[0m
+2026-11-21T11:16:18.4069873Z [36;1mecho ::endgroup::[0m
+2026-11-21T11:16:18.4113424Z shell: /usr/bin/sh -e {0}
+2026-11-21T11:16:18.4113677Z env:
+2026-11-21T11:16:18.4113855Z   GITHUB_PAGES: true
+2026-11-21T11:16:18.4114038Z   INPUT_PATH: ./dist
+2026-11-21T11:16:18.4114213Z ##[endgroup]
+2026-11-21T11:16:18.4173681Z ##[group]Archive artifact
+2026-11-21T11:16:18.4186752Z ./
+2026-11-21T11:16:18.4186964Z ./og-image.jpg
+2026-11-21T11:16:18.4188612Z ./apple-touch-icon.png
+2026-11-21T11:16:18.4189167Z ./assets/
+2026-11-21T11:16:18.4189472Z ./assets/aistudio/
+2026-11-21T11:16:18.4189836Z ./assets/aistudio/image_193189cc.png
+2026-11-21T11:16:18.4190610Z ./assets/aistudio/image_967c3983.png
+2026-11-21T11:16:18.4213876Z ./assets/aistudio/image_98a6d909.png
+2026-11-21T11:16:18.4214285Z ./assets/index-DKASJLrv.js
+2026-11-21T11:16:18.4216694Z ./assets/index-BHwYt_9S.css
+2026-11-21T11:16:18.4217275Z ./assets/trees/
+2026-11-21T11:16:18.4217593Z ./assets/trees/finska_smarahd_06.jpg
+2026-11-21T11:16:18.4222893Z ./assets/trees/finska_smarahd_01.jpg
+2026-11-21T11:16:18.4228330Z ./assets/trees/finska_smarahd_04.jpg
+2026-11-21T11:16:18.4233186Z ./assets/trees/07_alaska_snih_06.jpg
+2026-11-21T11:16:18.4244531Z ./assets/trees/finska_green_05.jpg
+2026-11-21T11:16:18.4247695Z ./assets/trees/07_alaska_snih_05.jpg
+2026-11-21T11:16:18.4255096Z ./assets/trees/finska_smarahd_03.jpg
+2026-11-21T11:16:18.4259596Z ./assets/trees/sosna_02.jpg
+2026-11-21T11:16:18.4269678Z ./assets/trees/finska_green_01.jpg
+2026-11-21T11:16:18.4275626Z ./assets/trees/07_alaska_snih_04.jpg
+2026-11-21T11:16:18.4282804Z ./assets/trees/sosna_07.jpg
+2026-11-21T11:16:18.4289655Z ./assets/trees/sosna_03.jpg
+2026-11-21T11:16:18.4299052Z ./assets/trees/alaska_02.jpg
+2026-11-21T11:16:18.4303575Z ./assets/trees/07_alaska_snih_03.jpg
+2026-11-21T11:16:18.4316225Z ./assets/trees/finska_smarahd_05.jpg
+2026-11-21T11:16:18.4319891Z ./assets/trees/finska_green_04.jpg
+2026-11-21T11:16:18.4325421Z ./assets/trees/finska_smarahd_08.jpg
+2026-11-21T11:16:18.4331052Z ./assets/trees/finska_green_06.jpg
+2026-11-21T11:16:18.4336841Z ./assets/trees/finska_green_02.jpg
+2026-11-21T11:16:18.4342337Z ./assets/trees/07_alaska_snih_01.jpg
+2026-11-21T11:16:18.4356126Z ./assets/trees/alaska_01.jpg
+2026-11-21T11:16:18.4360902Z ./assets/trees/finska_smarahd_02.jpg
+2026-11-21T11:16:18.4366288Z ./assets/trees/alaska_06.jpg
+2026-11-21T11:16:18.4371868Z ./assets/trees/sosna_04.jpg
+2026-11-21T11:16:18.4381351Z ./assets/trees/alaska_03.jpg
+2026-11-21T11:16:18.4386404Z ./assets/trees/alaska_04.jpg
+2026-11-21T11:16:18.4390578Z ./assets/trees/sosna_05.jpg
+2026-11-21T11:16:18.4398948Z ./assets/trees/finska_smarahd_07.jpg
+2026-11-21T11:16:18.4404645Z ./assets/trees/sosna_01.jpg
+2026-11-21T11:16:18.4414338Z ./assets/trees/sosna_06.jpg
+2026-11-21T11:16:18.4422729Z ./assets/trees/07_alaska_snih_02.jpg
+2026-11-21T11:16:18.4434635Z ./assets/trees/alaska_05.jpg
+2026-11-21T11:16:18.4437820Z ./assets/trees/finska_green_03.jpg
+2026-11-21T11:16:18.4443412Z ./favicon-96x96.png
+2026-11-21T11:16:18.4443686Z ./.htaccess
+2026-11-21T11:16:18.4444095Z ./404.html
+2026-11-21T11:16:18.4444673Z ./index.html
+2026-11-21T11:16:18.4445077Z ./src/
+2026-11-21T11:16:18.4445370Z ./src/assets/
+2026-11-21T11:16:18.4445648Z ./src/assets/images/
+2026-11-21T11:16:18.4446075Z ./src/assets/images/tree_finnish_green_1795124529707.jpg
+2026-11-21T11:16:18.4451900Z ./src/assets/images/tree_alaska_classic_1795124529584.jpg
+2026-11-21T11:16:18.4457711Z ./src/assets/images/tree_pine_fluffy_1795124529321.jpg
+2026-11-21T11:16:18.4464016Z ./src/assets/images/tree_alaska_snow_1795124529778.jpg
+2026-11-21T11:16:18.4470321Z ./src/assets/images/tree_finnish_emerald_1795124529379.jpg
+2026-11-21T11:16:18.4476196Z ./favicon.svg
+2026-11-21T11:16:18.4476437Z ./.nojekyll
+2026-11-21T11:16:18.4480228Z ##[endgroup]
+2026-11-21T11:16:18.4493342Z ##[end-action id=__actions_upload-pages-artifact.__run;outcome=success;conclusion=success;duration_ms=44]
+2026-11-21T11:16:18.4496838Z ##[start-action display=Archive artifact;id=__actions_upload-pages-artifact.__run_2]
+2026-11-21T11:16:18.4500875Z ##[end-action id=__actions_upload-pages-artifact.__run_2;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-11-21T11:16:18.4503304Z ##[start-action display=Archive artifact;id=__actions_upload-pages-artifact.__run_3]
+2026-11-21T11:16:18.4506080Z ##[end-action id=__actions_upload-pages-artifact.__run_3;outcome=skipped;conclusion=skipped;duration_ms=0]
+2026-11-21T11:16:18.4507586Z ##[start-action display=Upload artifact;id=__actions_upload-pages-artifact.upload-artifact]
+2026-11-21T11:16:18.4553681Z ##[group]Run actions/upload-artifact@v4
+2026-11-21T11:16:18.4553925Z with:
+2026-11-21T11:16:18.4554089Z   name: github-pages
+2026-11-21T11:16:18.4554290Z   path: /home/runner/work/_temp/artifact.tar
+2026-11-21T11:16:18.4554528Z   retention-days: 1
+2026-11-21T11:16:18.4554705Z   if-no-files-found: error
+2026-11-21T11:16:18.4554898Z   compression-level: 6
+2026-11-21T11:16:18.4555076Z   overwrite: false
+2026-11-21T11:16:18.4555272Z   include-hidden-files: false
+2026-11-21T11:16:18.4555465Z env:
+2026-11-21T11:16:18.4555635Z   GITHUB_PAGES: true
+2026-11-21T11:16:18.4555810Z ##[endgroup]
+2026-11-21T11:16:18.5996394Z (node:2341) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+2026-11-21T11:16:18.5997424Z (Use `node --trace-deprecation ...` to show where the warning was created)
+2026-11-21T11:16:18.6075756Z With the provided path, there will be 1 file uploaded
+2026-11-21T11:16:18.6100645Z Artifact name is valid!
+2026-11-21T11:16:18.6101297Z Root directory input is valid!
+2026-11-21T11:16:19.0024716Z Beginning upload of artifact content to blob storage
+2026-11-21T11:16:19.2445887Z (node:2341) [DEP0169] DeprecationWarning: `url.parse()` behavior is not standardized and prone to errors that have security implications. Use the WHATWG URL API instead. CVEs are not issued for `url.parse()` vulnerabilities.
+2026-11-21T11:16:20.2802089Z Uploaded bytes 8388608
+2026-11-21T11:16:20.4453534Z Uploaded bytes 16777216
+2026-11-21T11:16:20.7693643Z Uploaded bytes 25165824
+2026-11-21T11:16:20.9375329Z Uploaded bytes 33554432
+2026-11-21T11:16:21.0661151Z Uploaded bytes 36693657
+2026-11-21T11:16:21.1440516Z Finished uploading artifact content to blob storage!
+2026-11-21T11:16:21.1441502Z SHA256 digest of uploaded artifact zip is 9ffc1f9c8e7f3dde827a574c2aa547c75ee6a2e72f3363dcf48bee37320c9d26
+2026-11-21T11:16:21.1442390Z Finalizing artifact upload
+2026-11-21T11:16:21.5158811Z Artifact github-pages.zip successfully finalized. Artifact ID 14704728538
+2026-11-21T11:16:21.5159834Z Artifact github-pages has been successfully uploaded! Final size is 36693657 bytes. Artifact ID is 14704728538
+2026-11-21T11:16:21.5164691Z Artifact download URL: https://github.com/peroagency/Yalynochka/actions/runs/44898264885/artifacts/14704728538
+2026-11-21T11:16:21.5313920Z ##[end-action id=__actions_upload-pages-artifact.upload-artifact;outcome=success;conclusion=success;duration_ms=3080]
