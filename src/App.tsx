@@ -693,6 +693,12 @@ export default function App() {
                     <span>097 243 84 19</span>
                   </a>
                 </div>
+                <a
+                  href={CONTACT_LINKS.viberAlt}
+                  className="block text-[11px] font-medium text-[#112217]/60 hover:text-[#7360f2] underline underline-offset-2 transition-colors"
+                >
+                  Альтернативне посилання на чат у Viber
+                </a>
               </div>
             </div>
           </div>

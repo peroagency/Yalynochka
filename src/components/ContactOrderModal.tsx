@@ -10,10 +10,9 @@ import {
 } from '../data/trees';
 
 export const CONTACT_LINKS = {
-  viber: 'viber://chat?number=+380996584484',
-  viberAdd: 'viber://add?number=380996584484',
+  viber: 'viber://add?number=380996584484',
+  viberAlt: 'viber://chat?number=+380996584484',
   viberDisplay: '+38 (099) 658-44-84',
-  viberRawNumber: '+380996584484',
   telegram: 'https://t.me/yalynochka_com',
   telegramHandle: '@yalynochka_com',
   phone: 'tel:+380972438419',
@@ -37,7 +36,6 @@ export function ContactOrderModal({
 }: ContactOrderModalProps) {
   const [height, setHeight] = useState<TreeHeight>(selectedHeight);
   const [copied, setCopied] = useState(false);
-  const [copiedPhone, setCopiedPhone] = useState(false);
 
   useEffect(() => {
     setHeight(selectedHeight);
@@ -66,16 +64,6 @@ export function ContactOrderModal({
       await navigator.clipboard.writeText(orderText);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2000);
-    } catch {
-      // Clipboard may be unavailable in restricted contexts; ignore silently
-    }
-  };
-
-  const handleCopyViberPhone = async () => {
-    try {
-      await navigator.clipboard.writeText(CONTACT_LINKS.viberRawNumber);
-      setCopiedPhone(true);
-      window.setTimeout(() => setCopiedPhone(false), 2000);
     } catch {
       // Clipboard may be unavailable in restricted contexts; ignore silently
     }
@@ -201,31 +189,13 @@ export function ContactOrderModal({
               </span>
             </a>
 
-            <div className="flex flex-wrap items-center justify-between gap-2 px-1 text-[11px] text-[#112217]/70">
-              <a
-                href={CONTACT_LINKS.viberAdd}
-                className="underline underline-offset-2 hover:text-[#112217]"
-              >
-                Відкрити через додавання контакту у Viber
-              </a>
-              <button
-                type="button"
-                onClick={handleCopyViberPhone}
-                className="inline-flex items-center gap-1 font-semibold text-[#7360f2] hover:underline cursor-pointer"
-              >
-                {copiedPhone ? (
-                  <>
-                    <Check className="w-3 h-3" />
-                    <span>Номер скопійовано</span>
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-3 h-3" />
-                    <span>Скопіювати номер</span>
-                  </>
-                )}
-              </button>
-            </div>
+            <a
+              href={CONTACT_LINKS.viberAlt}
+              onClick={handleCopyText}
+              className="block text-center text-[11px] font-medium text-[#112217]/65 hover:text-[#7360f2] underline underline-offset-2 pb-1 transition-colors"
+            >
+              Альтернативне посилання на Viber (якщо основне не відкрилось)
+            </a>
 
             {/* 2. Telegram */}
             <a
