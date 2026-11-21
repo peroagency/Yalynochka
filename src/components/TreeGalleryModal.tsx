@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ArrowRight, ChevronLeft, ChevronRight, Play, X } from 'lucide-react';
 import {
   DEFAULT_TARGET_HEIGHT,
   HEIGHT_ORDER,
@@ -27,6 +27,8 @@ export function TreeGalleryModal({
   const [activeIndex, setActiveIndex] = useState(initialIndex);
   const [selectedHeight, setSelectedHeight] = useState<TreeHeight>(initialHeight);
 
+  const totalItems = tree ? tree.gallery.length + (tree.video ? 1 : 0) : 0;
+
   useEffect(() => {
     setActiveIndex(initialIndex);
   }, [initialIndex, tree?.id]);
@@ -36,23 +38,25 @@ export function TreeGalleryModal({
   }, [initialHeight, tree?.id]);
 
   useEffect(() => {
-    if (!tree) return;
+    if (!tree || totalItems === 0) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
       if (e.key === 'ArrowRight') {
-        setActiveIndex((prev) => (prev + 1) % tree.gallery.length);
+        setActiveIndex((prev) => (prev + 1) % totalItems);
       }
       if (e.key === 'ArrowLeft') {
-        setActiveIndex((prev) => (prev - 1 + tree.gallery.length) % tree.gallery.length);
+        setActiveIndex((prev) => (prev - 1 + totalItems) % totalItems);
       }
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [tree, onClose]);
+  }, [tree, totalItems, onClose]);
 
   if (!tree) return null;
 
+  const isVideoActive = Boolean(tree.video && activeIndex === tree.gallery.length);
   const currentPhoto = tree.gallery[activeIndex] ?? tree.gallery[0];
+  const currentLabel = isVideoActive && tree.video ? tree.video.label : currentPhoto.label;
   const tier = getTreePriceTier(tree, selectedHeight);
   const stock = tree.stockByHeight[selectedHeight];
 
@@ -68,38 +72,53 @@ export function TreeGalleryModal({
         className="relative w-full max-w-4xl bg-[#f8f6f1] text-[#112217] rounded-2xl overflow-hidden shadow-2xl grid grid-cols-1 md:grid-cols-12 max-h-[92vh]"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Left: Large Photo Viewer */}
+        {/* Left: Large Photo / Video Viewer */}
         <div className="md:col-span-7 relative bg-[#0e2216] flex items-center justify-center min-h-[340px] md:min-h-[540px]">
-          <img
-            src={currentPhoto.src}
-            alt={`${tree.name} — ${currentPhoto.label}`}
-            referrerPolicy="no-referrer"
-            className="w-full h-full max-h-[60vh] md:max-h-[82vh] object-contain"
-          />
+          {isVideoActive && tree.video ? (
+            <video
+              key={tree.video.src}
+              src={tree.video.src}
+              poster={tree.video.poster}
+              controls
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              className="w-full h-full max-h-[60vh] md:max-h-[82vh] object-contain bg-[#09170f]"
+            />
+          ) : (
+            <img
+              src={currentPhoto.src}
+              alt={`${tree.name} — ${currentPhoto.label}`}
+              referrerPolicy="no-referrer"
+              className="w-full h-full max-h-[60vh] md:max-h-[82vh] object-contain"
+            />
+          )}
 
           {/* Prev / Next arrows */}
           <button
             type="button"
-            onClick={() =>
-              setActiveIndex((prev) => (prev - 1 + tree.gallery.length) % tree.gallery.length)
-            }
-            aria-label="Попереднє фото"
+            onClick={() => setActiveIndex((prev) => (prev - 1 + totalItems) % totalItems)}
+            aria-label="Попередній слайд"
             className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-[#09170f]/75 text-[#f3ead3] hover:bg-[#09170f] transition-colors cursor-pointer"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <button
             type="button"
-            onClick={() => setActiveIndex((prev) => (prev + 1) % tree.gallery.length)}
-            aria-label="Наступне фото"
+            onClick={() => setActiveIndex((prev) => (prev + 1) % totalItems)}
+            aria-label="Наступний слайд"
             className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-[#09170f]/75 text-[#f3ead3] hover:bg-[#09170f] transition-colors cursor-pointer"
           >
             <ChevronRight className="w-5 h-5" />
           </button>
 
-          <div className="absolute bottom-3 left-4 bg-[#09170f]/80 text-[#f3ead3] text-xs font-semibold px-3 py-1.5 rounded-md">
-            {currentPhoto.label} · {activeIndex + 1}/{tree.gallery.length}
-          </div>
+          {!isVideoActive && (
+            <div className="absolute bottom-3 left-4 bg-[#09170f]/80 text-[#f3ead3] text-xs font-semibold px-3 py-1.5 rounded-md tabular-nums">
+              {currentLabel} · {activeIndex + 1}/{totalItems}
+            </div>
+          )}
         </div>
 
         {/* Right: Thumbnails + Quick Purchase */}
@@ -131,7 +150,7 @@ export function TreeGalleryModal({
             {/* Thumbnail Grid */}
             <div className="mt-4">
               <p className="text-xs font-semibold text-[#112217]/80 mb-2">
-                Усі ракурси та макро хвої:
+                Усі ракурси{tree.video ? ', відеоогляд' : ''} та макро хвої:
               </p>
               <div className="grid grid-cols-4 gap-2">
                 {tree.gallery.map((photo, idx) => {
@@ -159,6 +178,35 @@ export function TreeGalleryModal({
                     </button>
                   );
                 })}
+
+                {tree.video && (
+                  <button
+                    type="button"
+                    onClick={() => setActiveIndex(tree.gallery.length)}
+                    className={`group flex flex-col items-center rounded-lg overflow-hidden border transition-all cursor-pointer ${
+                      isVideoActive
+                        ? 'border-[#b81d24] ring-2 ring-[#b81d24]/30'
+                        : 'border-[#0e2216]/15 opacity-85 hover:opacity-100'
+                    }`}
+                  >
+                    <div className="relative w-full aspect-[3/4] bg-[#0e2216]">
+                      <img
+                        src={tree.video.poster}
+                        alt={`${tree.name} — ${tree.video.label}`}
+                        referrerPolicy="no-referrer"
+                        className="w-full h-full object-cover opacity-80"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center bg-[#09170f]/35">
+                        <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-[#b81d24] text-white shadow">
+                          <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+                        </span>
+                      </div>
+                    </div>
+                    <span className="w-full py-1 px-1 text-[10px] font-semibold text-center bg-white text-[#b81d24] truncate">
+                      {tree.video.label}
+                    </span>
+                  </button>
+                )}
               </div>
             </div>
 
@@ -166,13 +214,18 @@ export function TreeGalleryModal({
             <div className="mt-5">
               <div className="flex items-center justify-between text-xs mb-2">
                 <span className="font-semibold text-[#112217]/80">Висота:</span>
-                <span className="font-semibold text-[#b81d24] tabular-nums">
-                  Залишилось {stock} шт.
+                <span
+                  className={`font-semibold tabular-nums ${
+                    stock > 0 ? 'text-[#b81d24]' : 'text-[#112217]/50'
+                  }`}
+                >
+                  {stock > 0 ? `Залишилось ${stock} шт.` : 'Немає в наявності'}
                 </span>
               </div>
               <div className="grid grid-cols-5 gap-1.5">
                 {HEIGHT_ORDER.map((h) => {
                   const active = selectedHeight === h;
+                  const isOut = tree.stockByHeight[h] === 0;
                   return (
                     <button
                       key={h}
@@ -181,7 +234,9 @@ export function TreeGalleryModal({
                       className={`py-2 px-1 rounded-md text-xs font-semibold cursor-pointer tabular-nums ${
                         active
                           ? 'bg-[#0e2216] text-[#f3ead3]'
-                          : 'bg-white text-[#112217] border border-[#0e2216]/15'
+                          : isOut
+                            ? 'bg-white text-[#112217]/35 border border-[#0e2216]/10 line-through'
+                            : 'bg-white text-[#112217] border border-[#0e2216]/15'
                       }`}
                     >
                       {h}
@@ -209,14 +264,20 @@ export function TreeGalleryModal({
 
             <button
               type="button"
+              disabled={stock === 0}
               onClick={() => {
+                if (stock === 0) return;
                 onOrder(tree, selectedHeight);
                 onClose();
               }}
-              className="w-full inline-flex items-center justify-center gap-2 bg-[#b81d24] hover:bg-[#99151b] text-white font-semibold text-sm py-3.5 px-5 rounded-lg transition-colors cursor-pointer"
+              className="w-full inline-flex items-center justify-center gap-2 bg-[#b81d24] hover:bg-[#99151b] disabled:bg-[#112217]/20 disabled:text-[#112217]/50 disabled:cursor-not-allowed text-white font-semibold text-sm py-3.5 px-5 rounded-lg transition-colors cursor-pointer"
             >
-              <span>Забрати {tree.name} {selectedHeight} по знижці</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>
+                {stock > 0
+                  ? `Забрати ${tree.name} ${selectedHeight} по знижці`
+                  : `${tree.name} ${selectedHeight} — немає в наявності`}
+              </span>
+              {stock > 0 && <ArrowRight className="w-4 h-4" />}
             </button>
           </div>
         </div>

@@ -19,6 +19,7 @@ import {
   formatUAH,
   getTreePriceTier,
 } from '../data/trees';
+import { ContactChannel, trackMetaLead } from '../utils/metaPixel';
 
 export interface CartItem {
   tree: TreeOffer;
@@ -134,6 +135,21 @@ export function CheckoutDrawer({
     }
   };
 
+  const handleSendViaChannel = (channel: ContactChannel, shouldCopy: boolean) => {
+    if (shouldCopy) {
+      void handleCopyMessage();
+    }
+    trackMetaLead({
+      channel,
+      source: 'checkout_drawer',
+      contentName: items
+        .map((item) => `${item.tree.name} (${item.height}) × ${item.quantity}`)
+        .join(', '),
+      contentIds: items.map((item) => item.tree.id),
+      value: totalSale,
+    });
+  };
+
   const telegramHref = `${CONTACT_LINKS.telegram}?text=${encodeURIComponent(messageText)}`;
 
   return (
@@ -175,7 +191,7 @@ export function CheckoutDrawer({
                 Кошик порожній
               </p>
               <p className="text-sm text-[#112217]/70 mt-1 max-w-xs">
-                Оберіть одну з 5 моделей ялинок зі знижкою 25% у каталозі або серед оферів.
+                Оберіть одну з 7 моделей ялинок зі знижкою 25% у каталозі або серед оферів.
               </p>
               <button
                 type="button"
@@ -237,23 +253,30 @@ export function CheckoutDrawer({
 
                         {/* Height switcher right inside cart */}
                         <div className="mt-2.5 flex flex-wrap gap-1">
-                          {HEIGHT_ORDER.map((h) => (
-                            <button
-                              key={h}
-                              type="button"
-                              onClick={() =>
-                                h !== item.height &&
-                                onChangeHeight(item.tree.id, item.height, h)
-                              }
-                              className={`px-2 py-1 text-[11px] font-semibold rounded cursor-pointer tabular-nums ${
-                                h === item.height
-                                  ? 'bg-[#0e2216] text-[#f3ead3]'
-                                  : 'bg-[#f8f6f1] text-[#112217]/75 hover:bg-[#efeae0]'
-                              }`}
-                            >
-                              {h}
-                            </button>
-                          ))}
+                          {HEIGHT_ORDER.map((h) => {
+                            const isOut = item.tree.stockByHeight[h] === 0;
+                            return (
+                              <button
+                                key={h}
+                                type="button"
+                                disabled={isOut}
+                                onClick={() =>
+                                  !isOut &&
+                                  h !== item.height &&
+                                  onChangeHeight(item.tree.id, item.height, h)
+                                }
+                                className={`px-2 py-1 text-[11px] font-semibold rounded tabular-nums ${
+                                  h === item.height
+                                    ? 'bg-[#0e2216] text-[#f3ead3] cursor-pointer'
+                                    : isOut
+                                      ? 'bg-[#f8f6f1] text-[#112217]/35 line-through cursor-not-allowed'
+                                      : 'bg-[#f8f6f1] text-[#112217]/75 hover:bg-[#efeae0] cursor-pointer'
+                                }`}
+                              >
+                                {h}
+                              </button>
+                            );
+                          })}
                         </div>
 
                         <div className="mt-3 flex items-center justify-between gap-2">
@@ -383,7 +406,7 @@ export function CheckoutDrawer({
                       href={telegramHref}
                       target="_blank"
                       rel="noopener noreferrer"
-                      onClick={handleCopyMessage}
+                      onClick={() => handleSendViaChannel('telegram', true)}
                       className="inline-flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-[#229ED9] hover:bg-[#1a8bc2] text-white text-xs sm:text-sm font-semibold transition-colors"
                     >
                       <span>Надіслати в Telegram</span>
@@ -391,7 +414,7 @@ export function CheckoutDrawer({
 
                     <a
                       href={CONTACT_LINKS.viber}
-                      onClick={handleCopyMessage}
+                      onClick={() => handleSendViaChannel('viber', true)}
                       className="inline-flex items-center justify-center gap-1.5 py-3 px-3 rounded-xl bg-[#7360f2] hover:bg-[#5f4ce0] text-white text-xs sm:text-sm font-semibold transition-colors"
                     >
                       <span>Надіслати у Viber</span>
@@ -400,7 +423,7 @@ export function CheckoutDrawer({
 
                   <a
                     href={CONTACT_LINKS.viberAlt}
-                    onClick={handleCopyMessage}
+                    onClick={() => handleSendViaChannel('viber', true)}
                     className="block text-center text-[11px] font-medium text-[#112217]/65 hover:text-[#7360f2] underline underline-offset-2 pt-0.5 transition-colors"
                   >
                     Альтернативне посилання на Viber (якщо основне не відкрилось)
@@ -408,6 +431,7 @@ export function CheckoutDrawer({
 
                   <a
                     href={CONTACT_LINKS.phone}
+                    onClick={() => handleSendViaChannel('phone', false)}
                     className="w-full inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-[#b81d24] hover:bg-[#99151b] text-white text-xs font-semibold transition-colors tabular-nums"
                   >
                     <Phone className="w-3.5 h-3.5 shrink-0" />

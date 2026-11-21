@@ -8,6 +8,7 @@ import {
   formatUAH,
   getTreePriceTier,
 } from '../data/trees';
+import { ContactChannel, trackMetaLead } from '../utils/metaPixel';
 
 export const CONTACT_LINKS = {
   viber: 'viber://add?number=380996584484',
@@ -69,6 +70,21 @@ export function ContactOrderModal({
     }
   };
 
+  const handleChannelClick = (channel: ContactChannel, shouldCopy: boolean) => {
+    if (shouldCopy) {
+      void handleCopyText();
+    }
+    trackMetaLead({
+      channel,
+      source: 'order_modal',
+      contentName: selectedTree
+        ? `${selectedTree.name} (${height})`
+        : 'Контакти / консультація по ялинках',
+      contentIds: selectedTree ? [selectedTree.id] : undefined,
+      value: selectedTree ? tier.salePrice : undefined,
+    });
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#09170f]/75 backdrop-blur-xs"
@@ -122,7 +138,9 @@ export function ContactOrderModal({
                     </span>
                   </div>
                   <p className="text-xs text-[#112217]/65 mt-0.5 tabular-nums">
-                    Залишилось {selectedTree.stockByHeight[height]} шт. · Оплата при отриманні
+                    {selectedTree.stockByHeight[height] > 0
+                      ? `Залишилось ${selectedTree.stockByHeight[height]} шт. · Оплата при отриманні`
+                      : 'Цей розмір закінчився'}
                   </p>
                   <div className="mt-1.5 flex items-baseline gap-2">
                     <span className="font-display text-xl font-bold text-[#112217] tabular-nums">
@@ -139,15 +157,19 @@ export function ContactOrderModal({
               <div className="mt-3.5 pt-3 border-t border-[#0e2216]/10 grid grid-cols-5 gap-1.5">
                 {HEIGHT_ORDER.map((h) => {
                   const active = h === height;
+                  const isOut = selectedTree.stockByHeight[h] === 0;
                   return (
                     <button
                       key={h}
                       type="button"
-                      onClick={() => setHeight(h)}
-                      className={`py-1.5 px-1 rounded-md text-xs font-semibold transition-colors cursor-pointer tabular-nums ${
+                      disabled={isOut}
+                      onClick={() => !isOut && setHeight(h)}
+                      className={`py-1.5 px-1 rounded-md text-xs font-semibold transition-colors tabular-nums ${
                         active
-                          ? 'bg-[#0e2216] text-[#f3ead3]'
-                          : 'bg-[#f8f6f1] text-[#112217] border border-[#0e2216]/12'
+                          ? 'bg-[#0e2216] text-[#f3ead3] cursor-pointer'
+                          : isOut
+                            ? 'bg-[#f8f6f1] text-[#112217]/35 border border-[#0e2216]/10 line-through cursor-not-allowed'
+                            : 'bg-[#f8f6f1] text-[#112217] border border-[#0e2216]/12 cursor-pointer'
                       }`}
                     >
                       {h}
@@ -163,7 +185,7 @@ export function ContactOrderModal({
             {/* 1. Viber */}
             <a
               href={CONTACT_LINKS.viber}
-              onClick={handleCopyText}
+              onClick={() => handleChannelClick('viber', true)}
               className="flex items-center justify-between gap-3 w-full px-4 py-3.5 rounded-xl bg-[#7360f2] hover:bg-[#5f4ce0] text-white transition-colors shadow-xs"
             >
               <div className="flex items-center gap-3">
@@ -191,7 +213,7 @@ export function ContactOrderModal({
 
             <a
               href={CONTACT_LINKS.viberAlt}
-              onClick={handleCopyText}
+              onClick={() => handleChannelClick('viber', true)}
               className="block text-center text-[11px] font-medium text-[#112217]/65 hover:text-[#7360f2] underline underline-offset-2 pb-1 transition-colors"
             >
               Альтернативне посилання на Viber (якщо основне не відкрилось)
@@ -202,6 +224,7 @@ export function ContactOrderModal({
               href={telegramHref}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() => handleChannelClick('telegram', false)}
               className="flex items-center justify-between gap-3 w-full px-4 py-3.5 rounded-xl bg-[#229ED9] hover:bg-[#1a8bc2] text-white transition-colors shadow-xs"
             >
               <div className="flex items-center gap-3">
@@ -230,6 +253,7 @@ export function ContactOrderModal({
             {/* 3. Замовити по телефону */}
             <a
               href={CONTACT_LINKS.phone}
+              onClick={() => handleChannelClick('phone', false)}
               className="flex items-center justify-between gap-3 w-full px-4 py-3.5 rounded-xl bg-[#b81d24] hover:bg-[#99151b] text-white transition-colors shadow-xs"
             >
               <div className="flex items-center gap-3">

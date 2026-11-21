@@ -7,19 +7,21 @@ import {
   MessageCircle,
   PackageCheck,
   Phone,
+  Play,
   ShieldCheck,
   ShoppingBag,
   Truck,
 } from 'lucide-react';
+import { BrandLogo } from './components/BrandLogo';
 import { CheckoutDrawer, CartItem } from './components/CheckoutDrawer';
 import { CONTACT_LINKS, ContactOrderModal } from './components/ContactOrderModal';
 import { SnowOverlay } from './components/SnowOverlay';
 import { TreeGalleryModal } from './components/TreeGalleryModal';
 import { TreeOfferCatalogCard } from './components/TreeOfferCatalogCard';
+import { TreeVideoSpotlight } from './components/TreeVideoSpotlight';
 import {
   DEFAULT_TARGET_HEIGHT,
   HEIGHT_ORDER,
-  LOGO_PATH,
   PRICE_TIERS,
   TREE_OFFERS,
   TreeHeight,
@@ -27,6 +29,11 @@ import {
   formatUAH,
   getTreePriceTier,
 } from './data/trees';
+import {
+  trackMetaAddToCart,
+  trackMetaInitiateCheckout,
+  trackMetaLead,
+} from './utils/metaPixel';
 
 export default function App() {
   const [cart, setCart] = useState<CartItem[]>([]);
@@ -58,12 +65,42 @@ export default function App() {
   }, []);
 
   const openOrderChoice = (tree: TreeOffer | null, height: TreeHeight = DEFAULT_TARGET_HEIGHT) => {
+    if (tree) {
+      const tier = getTreePriceTier(tree, height);
+      trackMetaInitiateCheckout({
+        contentName: `${tree.name} (${height})`,
+        contentIds: [tree.id],
+        numItems: 1,
+        value: tier.salePrice,
+      });
+    }
     setContactModal({ isOpen: true, tree, height });
+  };
+
+  const openCheckoutDrawer = (cartItems: CartItem[] = cart) => {
+    if (cartItems.length > 0) {
+      const numItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+      const value = cartItems.reduce(
+        (sum, item) => sum + getTreePriceTier(item.tree, item.height).salePrice * item.quantity,
+        0
+      );
+      trackMetaInitiateCheckout({
+        contentName: cartItems
+          .map((item) => `${item.tree.name} (${item.height}) × ${item.quantity}`)
+          .join(', '),
+        contentIds: cartItems.map((item) => item.tree.id),
+        numItems,
+        value,
+      });
+    }
+    setIsDrawerOpen(true);
   };
 
   const heroTree = TREE_OFFERS.find((t) => t.id === heroTreeId) ?? TREE_OFFERS[0];
   const heroPhoto = heroTree.gallery[heroPhotoIdx] ?? heroTree.gallery[0];
   const heroTier = getTreePriceTier(heroTree, heroHeight);
+  const heroStock = heroTree.stockByHeight[heroHeight];
+  const heroOutOfStock = heroStock <= 0;
 
   const totalCartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -75,24 +112,28 @@ export default function App() {
   };
 
   const addItemToCart = (tree: TreeOffer, height: TreeHeight, openDrawer: boolean) => {
-    setCart((prev) => {
-      const maxStock = tree.stockByHeight[height];
-      const existing = prev.find(
-        (item) => item.tree.id === tree.id && item.height === height
-      );
-      if (existing) {
-        if (existing.quantity >= maxStock) return prev;
-        return prev.map((item) =>
-          item.tree.id === tree.id && item.height === height
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prev, { tree, height, quantity: 1 }];
-    });
+    const maxStock = tree.stockByHeight[height];
+    const existingItem = cart.find(
+      (item) => item.tree.id === tree.id && item.height === height
+    );
+    const nextCart = existingItem
+      ? existingItem.quantity >= maxStock
+        ? cart
+        : cart.map((item) =>
+            item.tree.id === tree.id && item.height === height
+              ? { ...item, quantity: item.quantity + 1 }
+              : item
+          )
+      : [...cart, { tree, height, quantity: 1 }];
+
+    setCart(nextCart);
+
+    if (!existingItem || existingItem.quantity < maxStock) {
+      trackMetaAddToCart(tree, height);
+    }
 
     if (openDrawer) {
-      setIsDrawerOpen(true);
+      openCheckoutDrawer(nextCart);
     } else {
       showToast(`Додано: ${tree.name} (${height})`);
     }
@@ -162,15 +203,10 @@ export default function App() {
         <div className="max-w-7xl mx-auto h-full px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-8">
           <a
             href="#top"
-            className="flex items-center shrink-0 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f3ead3]"
+            className="flex items-center shrink-0 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f3ead3] transition-opacity hover:opacity-90"
             aria-label="Ялиночка — на головну"
           >
-            <img
-              src={LOGO_PATH}
-              alt="Ялиночка"
-              referrerPolicy="no-referrer"
-              className="h-7 sm:h-8 w-auto object-contain"
-            />
+            <BrandLogo size="md" />
           </a>
 
           <nav
@@ -208,7 +244,9 @@ export default function App() {
             <button
               type="button"
               onClick={() =>
-                totalCartCount > 0 ? setIsDrawerOpen(true) : openOrderChoice(heroTree, heroHeight)
+                totalCartCount > 0
+                  ? openCheckoutDrawer()
+                  : openOrderChoice(heroTree, heroOutOfStock ? DEFAULT_TARGET_HEIGHT : heroHeight)
               }
               className="inline-flex items-center gap-2 bg-[#b81d24] hover:bg-[#99151b] text-white text-xs sm:text-sm font-semibold px-4 py-2 rounded-lg transition-colors cursor-pointer whitespace-nowrap shrink-0 tabular-nums"
             >
@@ -237,7 +275,7 @@ export default function App() {
                 </h1>
 
                 <p className="mt-5 text-base sm:text-lg leading-relaxed text-[#f3ead3]/85 max-w-2xl">
-                  5 фірмових моделей із лімітованими залишками (до 9 шт. у кожному розмірі). Найвигідніший вибір сезону — висота{' '}
+                  7 фірмових моделей із лімітованими залишками (до 9 шт. у кожному розмірі). Найвигідніший вибір сезону — висота{' '}
                   <strong className="text-white font-semibold">1,8 м за 5 580 грн</strong>{' '}
                   замість 7 440 грн: оптимальна для оселі та найдешевша доставка у стандартне відділення.
                 </p>
@@ -248,8 +286,14 @@ export default function App() {
                     <span className="text-xs font-semibold text-[#f3ead3]/75">
                       Оберіть модель для перегляду фото та ракурсів:
                     </span>
-                    <span className="text-xs font-semibold text-[#e5d3a3] tabular-nums">
-                      Залишилось {heroTree.stockByHeight[heroHeight]} шт. у розмірі {heroHeight}
+                    <span
+                      className={`text-xs font-semibold tabular-nums ${
+                        heroOutOfStock ? 'text-[#fca5a5]' : 'text-[#e5d3a3]'
+                      }`}
+                    >
+                      {heroOutOfStock
+                        ? `Немає в наявності у розмірі ${heroHeight}`
+                        : `Залишилось ${heroStock} шт. у розмірі ${heroHeight}`}
                     </span>
                   </div>
 
@@ -279,6 +323,7 @@ export default function App() {
                   <div className="mt-3 flex flex-wrap gap-1.5">
                     {HEIGHT_ORDER.map((h) => {
                       const active = h === heroHeight;
+                      const outOfStock = heroTree.stockByHeight[h] <= 0;
                       return (
                         <button
                           key={h}
@@ -286,9 +331,13 @@ export default function App() {
                           onClick={() => setHeroHeight(h)}
                           className={`px-3 py-1.5 text-xs font-semibold rounded-md transition-colors cursor-pointer whitespace-nowrap tabular-nums ${
                             active
-                              ? 'bg-[#b81d24] text-white'
-                              : 'bg-white/6 text-[#f3ead3]/80 hover:bg-white/12'
-                          }`}
+                              ? outOfStock
+                                ? 'bg-white/20 text-[#f3ead3]'
+                                : 'bg-[#b81d24] text-white'
+                              : outOfStock
+                                ? 'bg-white/4 text-[#f3ead3]/40 hover:bg-white/10'
+                                : 'bg-white/6 text-[#f3ead3]/80 hover:bg-white/12'
+                          } ${outOfStock ? 'line-through' : ''}`}
                         >
                           {h} {h === '1,8 м' ? '· Хіт' : ''}
                         </button>
@@ -301,13 +350,20 @@ export default function App() {
                 <div className="mt-7 flex flex-wrap items-center gap-4">
                   <button
                     type="button"
+                    disabled={heroOutOfStock}
                     onClick={() => openOrderChoice(heroTree, heroHeight)}
-                    className="inline-flex items-center justify-center gap-2.5 bg-[#b81d24] hover:bg-[#99151b] text-white font-semibold text-sm sm:text-base px-6 py-3.5 rounded-lg shadow-lg transition-colors cursor-pointer whitespace-nowrap tabular-nums"
+                    className={`inline-flex items-center justify-center gap-2.5 font-semibold text-sm sm:text-base px-6 py-3.5 rounded-lg shadow-lg transition-colors whitespace-nowrap tabular-nums ${
+                      heroOutOfStock
+                        ? 'bg-white/15 text-[#f3ead3]/60 cursor-not-allowed'
+                        : 'bg-[#b81d24] hover:bg-[#99151b] text-white cursor-pointer'
+                    }`}
                   >
                     <span>
-                      Забрати {heroTree.name} {heroHeight} — {formatUAH(heroTier.salePrice)} грн
+                      {heroOutOfStock
+                        ? `Немає в наявності · ${heroTree.name} ${heroHeight}`
+                        : `Забрати ${heroTree.name} ${heroHeight} — ${formatUAH(heroTier.salePrice)} грн`}
                     </span>
-                    <ArrowRight className="w-4 h-4 shrink-0" />
+                    {!heroOutOfStock && <ArrowRight className="w-4 h-4 shrink-0" />}
                   </button>
 
                   <button
@@ -348,20 +404,39 @@ export default function App() {
                     className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#09170f]/95 via-[#09170f]/20 to-transparent"
                   />
 
-                  <button
-                    type="button"
-                    onClick={() =>
-                      setGalleryState({
-                        tree: heroTree,
-                        index: heroPhotoIdx,
-                        height: heroHeight,
-                      })
-                    }
-                    aria-label="Відкрити збільшену галерею"
-                    className="absolute top-4 right-4 p-2 rounded-lg bg-[#09170f]/75 hover:bg-[#09170f] text-[#f3ead3] transition-colors cursor-pointer"
-                  >
-                    <Maximize2 className="w-4 h-4" />
-                  </button>
+                  <div className="absolute top-4 right-4 z-20 flex items-center gap-1.5">
+                    {heroTree.video && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setGalleryState({
+                            tree: heroTree,
+                            index: heroTree.gallery.length,
+                            height: heroHeight,
+                          })
+                        }
+                        aria-label={`Дивитись відео ${heroTree.name}`}
+                        className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-[#09170f]/80 hover:bg-[#b81d24] text-[#f3ead3] text-xs font-semibold transition-colors cursor-pointer"
+                      >
+                        <Play className="w-3.5 h-3.5 fill-current shrink-0" />
+                        <span>Відео</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setGalleryState({
+                          tree: heroTree,
+                          index: heroPhotoIdx,
+                          height: heroHeight,
+                        })
+                      }
+                      aria-label="Відкрити збільшену галерею"
+                      className="p-2 rounded-lg bg-[#09170f]/75 hover:bg-[#09170f] text-[#f3ead3] transition-colors cursor-pointer"
+                    >
+                      <Maximize2 className="w-4 h-4" />
+                    </button>
+                  </div>
 
                   <div className="relative z-10 h-full flex flex-col justify-between p-5 sm:p-6 pointer-events-none">
                     <div className="flex items-center gap-2">
@@ -396,7 +471,7 @@ export default function App() {
 
                 {/* 4 Angle / Close-Up Thumbnails right in Hero */}
                 <div className="grid grid-cols-4 gap-2">
-                  {heroTree.gallery.map((photo, idx) => {
+                  {heroTree.gallery.slice(0, 4).map((photo, idx) => {
                     const active = idx === heroPhotoIdx;
                     return (
                       <button
@@ -455,15 +530,15 @@ export default function App() {
           </div>
         </section>
 
-        {/* Section 2: 5 Curated Tree Offers Storefront with Close-ups */}
+        {/* Section 2: 7 Curated Tree Offers Storefront with Close-ups */}
         <section id="catalog" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 sm:py-18">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
             <div>
               <p className="text-xs font-semibold text-[#b81d24] tracking-wide mb-2">
-                Тільки 5 актуальних моделей
+                Тільки 7 актуальних моделей
               </p>
               <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#112217] tracking-tight text-balance">
-                Каталог литих ялинок та сосни
+                Каталог литих ялинок, ялиць та сосни
               </h2>
             </div>
             <p className="text-sm text-[#112217]/75 max-w-md">
@@ -531,7 +606,7 @@ export default function App() {
                   </div>
 
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {tree.gallery.map((photo, idx) => (
+                    {tree.gallery.slice(0, 4).map((photo, idx) => (
                       <button
                         key={photo.src}
                         type="button"
@@ -561,6 +636,19 @@ export default function App() {
                       </button>
                     ))}
                   </div>
+
+                  {tree.video && (
+                    <TreeVideoSpotlight
+                      tree={tree}
+                      onOpenModalVideo={(t) =>
+                        setGalleryState({
+                          tree: t,
+                          index: t.gallery.length,
+                          height: DEFAULT_TARGET_HEIGHT,
+                        })
+                      }
+                    />
+                  )}
                 </div>
               ))}
             </div>
@@ -572,7 +660,7 @@ export default function App() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
             <div className="lg:col-span-7">
               <p className="text-xs font-semibold text-[#b81d24] tracking-wide mb-2">
-                Прозорі ціни для всіх 5 моделей
+                Прозорі ціни для всіх 7 моделей
               </p>
               <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-5">
                 <h2 className="font-display text-3xl sm:text-4xl font-bold text-[#112217] tracking-tight text-balance">
@@ -595,7 +683,7 @@ export default function App() {
                         : 'text-[#112217]/75 hover:text-[#112217]'
                     }`}
                   >
-                    Зелені моделі та Сосна
+                    Класична серія
                   </button>
                   <button
                     type="button"
@@ -608,7 +696,7 @@ export default function App() {
                         : 'text-[#112217]/75 hover:text-[#112217]'
                     }`}
                   >
-                    Аляска сніг
+                    Аляска Засніжена та Ялиці
                   </button>
                 </div>
               </div>
@@ -675,8 +763,8 @@ export default function App() {
               </div>
               <p className="mt-2.5 text-xs text-[#112217]/65">
                 {priceTab === 'alaska-snow'
-                  ? 'Ціни для моделі Аляска сніг (засніжена хвоя).'
-                  : 'Діє для моделей: Аляска, Фінська зелена, Фінська Смарагдова та Сосна.'}
+                  ? 'Діє для моделей: Аляска Засніжена, Ялиця Зелена та Ялиця Блакитна.'
+                  : 'Діє для моделей: Фінська Зелена, Фінська Смарагдова, Аляска Зелена та Сосна Зелена.'}
               </p>
             </div>
 
@@ -726,6 +814,9 @@ export default function App() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   <a
                     href={CONTACT_LINKS.viber}
+                    onClick={() =>
+                      trackMetaLead({ channel: 'viber', source: 'section_contacts' })
+                    }
                     className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg bg-[#7360f2] hover:bg-[#5f4ce0] text-white text-xs font-semibold transition-colors whitespace-nowrap"
                   >
                     Viber
@@ -734,12 +825,18 @@ export default function App() {
                     href={CONTACT_LINKS.telegram}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() =>
+                      trackMetaLead({ channel: 'telegram', source: 'section_contacts' })
+                    }
                     className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg bg-[#229ED9] hover:bg-[#1a8bc2] text-white text-xs font-semibold transition-colors whitespace-nowrap"
                   >
                     Telegram
                   </a>
                   <a
                     href={CONTACT_LINKS.phone}
+                    onClick={() =>
+                      trackMetaLead({ channel: 'phone', source: 'section_contacts' })
+                    }
                     className="inline-flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-lg bg-[#0e2216] hover:bg-[#153120] text-[#f3ead3] text-xs font-semibold transition-colors whitespace-nowrap tabular-nums"
                   >
                     <Phone className="w-3.5 h-3.5 shrink-0" />
@@ -748,6 +845,9 @@ export default function App() {
                 </div>
                 <a
                   href={CONTACT_LINKS.viberAlt}
+                  onClick={() =>
+                    trackMetaLead({ channel: 'viber', source: 'section_contacts' })
+                  }
                   className="block text-[11px] font-medium text-[#112217]/60 hover:text-[#7360f2] underline underline-offset-2 transition-colors"
                 >
                   Альтернативне посилання на чат у Viber
@@ -762,30 +862,46 @@ export default function App() {
       <footer className="bg-[#0e2216] text-[#f3ead3] border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
-            <img
-              src={LOGO_PATH}
-              alt="Ялиночка"
-              referrerPolicy="no-referrer"
-              className="h-7 w-auto object-contain mb-2"
-            />
+            <a
+              href="#top"
+              aria-label="Ялиночка — на початок сторінки"
+              className="inline-flex items-center mb-2.5 rounded-md focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#f3ead3] transition-opacity hover:opacity-90"
+            >
+              <BrandLogo size="sm" />
+            </a>
             <p className="text-xs text-[#f3ead3]/70">
               Виробництво та розпродаж литих ялинок · Оплата при отриманні по всій Україні
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-5 text-xs text-[#f3ead3]/80">
-            <a href={CONTACT_LINKS.viber} className="hover:text-white transition-colors">
+            <a
+              href={CONTACT_LINKS.viber}
+              onClick={() =>
+                trackMetaLead({ channel: 'viber', source: 'footer_contacts' })
+              }
+              className="hover:text-white transition-colors"
+            >
               Viber
             </a>
             <a
               href={CONTACT_LINKS.telegram}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() =>
+                trackMetaLead({ channel: 'telegram', source: 'footer_contacts' })
+              }
               className="hover:text-white transition-colors"
             >
               Telegram
             </a>
-            <a href={CONTACT_LINKS.phone} className="hover:text-white transition-colors tabular-nums">
+            <a
+              href={CONTACT_LINKS.phone}
+              onClick={() =>
+                trackMetaLead({ channel: 'phone', source: 'footer_contacts' })
+              }
+              className="hover:text-white transition-colors tabular-nums"
+            >
               +38 (097) 243-84-19
             </a>
             <span className="text-[#f3ead3]/50">© 2026 Ялиночка</span>
@@ -834,7 +950,7 @@ export default function App() {
           <span>{toastMessage}</span>
           <button
             type="button"
-            onClick={() => setIsDrawerOpen(true)}
+            onClick={() => openCheckoutDrawer()}
             className="ml-2 text-xs font-bold text-[#e5d3a3] underline underline-offset-2 cursor-pointer"
           >
             Оформити

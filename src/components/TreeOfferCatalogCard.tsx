@@ -4,6 +4,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Maximize2,
+  Play,
   Plus,
   ShoppingBag,
   Trees,
@@ -69,15 +70,28 @@ export function TreeOfferCatalogCard({
           </div>
         )}
 
-        {/* Top-right Zoom Lightbox Button */}
-        <button
-          type="button"
-          onClick={() => onOpenGallery(tree, photoIndex, selectedHeight)}
-          aria-label={`Збільшити фото ${tree.name}`}
-          className="absolute top-3 right-3 p-2 rounded-lg bg-[#09170f]/70 hover:bg-[#09170f] text-[#f3ead3] transition-colors cursor-pointer"
-        >
-          <Maximize2 className="w-4 h-4" />
-        </button>
+        {/* Top-right Video & Zoom Lightbox Buttons */}
+        <div className="absolute top-3 right-3 flex items-center gap-1.5">
+          {tree.video && (
+            <button
+              type="button"
+              onClick={() => onOpenGallery(tree, tree.gallery.length, selectedHeight)}
+              aria-label={`Дивитись відео ${tree.name}`}
+              className="inline-flex items-center gap-1.5 px-2.5 py-2 rounded-lg bg-[#09170f]/80 hover:bg-[#b81d24] text-[#f3ead3] text-xs font-semibold transition-colors cursor-pointer"
+            >
+              <Play className="w-3.5 h-3.5 fill-current shrink-0" />
+              <span>Відео</span>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => onOpenGallery(tree, photoIndex, selectedHeight)}
+            aria-label={`Збільшити фото ${tree.name}`}
+            className="p-2 rounded-lg bg-[#09170f]/70 hover:bg-[#09170f] text-[#f3ead3] transition-colors cursor-pointer"
+          >
+            <Maximize2 className="w-4 h-4" />
+          </button>
+        </div>
 
         {/* Left / Right Photo Angle Switcher */}
         <button
@@ -113,9 +127,9 @@ export function TreeOfferCatalogCard({
         </div>
       </div>
 
-      {/* Close-up & Angles Thumbnail Strip */}
+      {/* Close-up & Angles Thumbnail Strip (up to 4 highlights) */}
       <div className="grid grid-cols-4 gap-1.5 p-2.5 bg-[#f8f6f1] border-b border-[#0e2216]/10">
-        {tree.gallery.map((photo, idx) => {
+        {tree.gallery.slice(0, 4).map((photo, idx) => {
           const active = idx === photoIndex;
           return (
             <button
@@ -165,8 +179,12 @@ export function TreeOfferCatalogCard({
         <div className="mt-5">
           <div className="flex items-center justify-between text-xs mb-2">
             <span className="font-semibold text-[#112217]/80">Оберіть висоту:</span>
-            <span className="font-semibold text-[#b81d24] tabular-nums">
-              Залишилось {stock} шт.
+            <span
+              className={`font-semibold tabular-nums ${
+                stock > 0 ? 'text-[#b81d24]' : 'text-[#112217]/50'
+              }`}
+            >
+              {stock > 0 ? `Залишилось ${stock} шт.` : 'Немає в наявності'}
             </span>
           </div>
 
@@ -178,6 +196,8 @@ export function TreeOfferCatalogCard({
             {HEIGHT_ORDER.map((height) => {
               const active = selectedHeight === height;
               const isTarget = height === '1,8 м';
+              const heightStock = tree.stockByHeight[height];
+              const isOut = heightStock === 0;
               return (
                 <button
                   key={height}
@@ -186,7 +206,9 @@ export function TreeOfferCatalogCard({
                   className={`py-2 px-1 rounded-lg text-xs font-semibold transition-colors cursor-pointer whitespace-nowrap tabular-nums ${
                     active
                       ? 'bg-[#0e2216] text-[#f3ead3]'
-                      : 'bg-[#f8f6f1] text-[#112217] border border-[#0e2216]/12 hover:border-[#0e2216]/35'
+                      : isOut
+                        ? 'bg-[#f8f6f1] text-[#112217]/40 border border-[#0e2216]/10 line-through'
+                        : 'bg-[#f8f6f1] text-[#112217] border border-[#0e2216]/12 hover:border-[#0e2216]/35'
                   }`}
                 >
                   <span className="block">{height}</span>
@@ -237,18 +259,20 @@ export function TreeOfferCatalogCard({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => onQuickOrder(tree, selectedHeight)}
-              className="flex-1 inline-flex items-center justify-center gap-2 bg-[#b81d24] hover:bg-[#99151b] text-white font-semibold text-sm py-3 px-4 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
+              disabled={stock === 0}
+              onClick={() => stock > 0 && onQuickOrder(tree, selectedHeight)}
+              className="flex-1 inline-flex items-center justify-center gap-2 bg-[#b81d24] hover:bg-[#99151b] disabled:bg-[#112217]/20 disabled:text-[#112217]/50 disabled:cursor-not-allowed text-white font-semibold text-sm py-3 px-4 rounded-lg transition-colors cursor-pointer whitespace-nowrap"
             >
-              <span>Забрати по знижці</span>
-              <ArrowRight className="w-4 h-4 shrink-0" />
+              <span>{stock > 0 ? 'Забрати по знижці' : 'Розмір розпродано'}</span>
+              {stock > 0 && <ArrowRight className="w-4 h-4 shrink-0" />}
             </button>
             <button
               type="button"
-              onClick={() => onAddToCart(tree, selectedHeight)}
+              disabled={stock === 0}
+              onClick={() => stock > 0 && onAddToCart(tree, selectedHeight)}
               aria-label={`Додати ${tree.name} ${selectedHeight} у кошик`}
-              title="Додати в кошик"
-              className="inline-flex items-center justify-center p-3 rounded-lg border border-[#0e2216]/15 bg-[#f8f6f1] hover:bg-[#efeae0] text-[#112217] transition-colors cursor-pointer shrink-0"
+              title={stock > 0 ? 'Додати в кошик' : 'Немає в наявності'}
+              className="inline-flex items-center justify-center p-3 rounded-lg border border-[#0e2216]/15 bg-[#f8f6f1] hover:bg-[#efeae0] disabled:opacity-40 disabled:cursor-not-allowed text-[#112217] transition-colors cursor-pointer shrink-0"
             >
               <Plus className="w-4 h-4" />
               <ShoppingBag className="w-4 h-4 -ml-0.5" />
