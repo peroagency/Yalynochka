@@ -93,18 +93,52 @@ jobs:
           name: ftp-dist
           path: './dist'
 
+      - name: Install lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
       - name: Sync dist to Hosting Ukraine FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.3.5
-        with:
-          server: ${{ secrets.FTP_SERVER }}
-          username: ${{ secrets.FTP_USERNAME }}
-          password: ${{ secrets.FTP_PASSWORD }}
-          protocol: ftps
-          security: loose
-          local-dir: ./dist/
-          server-dir: ${{ secrets.FTP_SERVER_DIR || './' }}
-          exclude: |
-            **/.git*
-            **/.git*/**
-            **/node_modules/**
-            .nojekyll
+        env:
+          FTP_SERVER: ${{ secrets.FTP_SERVER }}
+          FTP_USERNAME: ${{ secrets.FTP_USERNAME }}
+          FTP_PASSWORD: ${{ secrets.FTP_PASSWORD }}
+          FTP_SERVER_DIR: ${{ secrets.FTP_SERVER_DIR }}
+        run: |
+          export LFTP_PASSWORD="$FTP_PASSWORD"
+          TARGET_DIR="${FTP_SERVER_DIR:-.}"
+
+          run_lftp() {
+            local ssl_allow="$1"
+            local ssl_protect_data="$2"
+            lftp -e "
+              set cmd:fail-exit true;
+              set ftp:ssl-allow ${ssl_allow};
+              set ftp:ssl-force false;
+              set ftp:ssl-protect-data ${ssl_protect_data};
+              set ssl:verify-certificate no;
+              set ftp:passive-mode true;
+              set ftp:chmod no;
+              set net:timeout 30;
+              set net:max-retries 4;
+              set net:reconnect-interval-base 3;
+              set xfer:clobber on;
+              open --env-password -u '${FTP_USERNAME}' '${FTP_SERVER}';
+              mirror --reverse --delete --verbose --no-perms --parallel=2 --exclude-glob .nojekyll --exclude-glob '*.txt' --exclude-glob 'assets/aistudio/image_193189cc.png' --exclude-glob 'assets/aistudio/image_27c02062.png' --exclude-glob 'assets/aistudio/image_938f1a13.png' --exclude-glob 'assets/aistudio/image_967c3983.png' ./dist '${TARGET_DIR}';
+              bye
+            "
+          }
+
+          echo "Trying FTPS (TLS control + data)..."
+          if run_lftp true true; then
+            echo "FTP deploy succeeded (FTPS)"
+            exit 0
+          fi
+
+          echo "FTPS data socket failed; retrying with TLS control only (PROT C)..."
+          if run_lftp true false; then
+            echo "FTP deploy succeeded (FTPS control / PROT C)"
+            exit 0
+          fi
+
+          echo "TLS FTP failed; retrying with plain passive FTP..."
+          run_lftp false false
+          echo "FTP deploy succeeded (FTP)"
