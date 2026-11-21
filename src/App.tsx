@@ -195,7 +195,7 @@ export default function App() {
   };
 
   return (
-    <div id="top" className="min-h-screen flex flex-col bg-[#f8f6f1] text-[#112217]">
+    <div id="top" className="relative min-h-screen flex flex-col bg-[#f8f6f1] text-[#112217]">
       <SnowOverlay />
 
       {/* Top Bar Contract: 3 zones, 1 row, single-line controls */}
